@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import 'semantic-ui/dist/semantic.min.css'
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import {createStore} from 'redux'
-import {Provider, applyMiddleWare } from 'react-redux'
+import {createStore , applyMiddleware} from 'redux'
+import {Provider } from 'react-redux'
 import rootReducer from './reducers/rootReducer'
 import thunk from 'redux-thunk'
-import {composeWithDevTools} from 'redux-devtools-extention'
+import {composeWithDevTools} from 'redux-devtools-extension'
+import {BrowserRouter as Router} from 'react-router-dom'
 
-const store = createStore(rootReducer, composeWithDevTools(applyMiddleWare(thunk)))
+const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
 
 ReactDOM.render(
   <Provider store={store}>
