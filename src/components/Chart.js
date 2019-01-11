@@ -1,40 +1,35 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-
+import { scaleTime } from "d3-scale";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
 	BarSeries,
-	AreaSeries,
+	CandlestickSeries,
 } from "react-stockcharts/lib/series";
-import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
+
 import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import {
 	CrossHairCursor,
+  EdgeIndicator,
+  CurrentCoordinate,
 	MouseCoordinateX,
 	MouseCoordinateY,
 } from "react-stockcharts/lib/coordinates";
 
-import { SingleValueTooltip } from "react-stockcharts/lib/tooltip";
+import { OHLCTooltip } from "react-stockcharts/lib/tooltip";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last } from "react-stockcharts/lib/utils";
 
 class AreaChartWithEdge extends React.Component {
 	render() {
-		const { type, data: initialData, width, ratio } = this.props;
+		const { type, data, width, ratio } = this.props;
 
-		const xScaleProvider = discontinuousTimeScaleProvider
-			.inputDateAccessor(d => d.date);
-		const {
-			data,
-			xScale,
-			xAccessor,
-			displayXAccessor,
-		} = xScaleProvider(initialData);
 
+    const xAccessor = d => d.date;
 		const start = xAccessor(last(data));
 		const end = xAccessor(data[Math.max(0, data.length - 150)]);
 		const xExtents = [start, end];
@@ -46,9 +41,8 @@ class AreaChartWithEdge extends React.Component {
 				type={type}
 				seriesName="MSFT"
 				data={data}
-				xScale={xScale}
+				xScale={scaleTime()}
 				xAccessor={xAccessor}
-				displayXAccessor={displayXAccessor}
 				xExtents={xExtents}
 			>
 				<Chart id={1}
@@ -58,6 +52,7 @@ class AreaChartWithEdge extends React.Component {
 					<YAxis axisAt="right" orient="right" ticks={5} />
 
 					<MouseCoordinateX
+            rectWidth={60}
 						at="bottom"
 						orient="bottom"
 						displayFormat={timeFormat("%Y-%m-%d")} />
@@ -66,19 +61,16 @@ class AreaChartWithEdge extends React.Component {
 						orient="right"
 						displayFormat={format(".2f")} />
 
-					<AreaSeries yAccessor={d => d.close}/>
+        	<CandlestickSeries />
 
-					<SingleValueTooltip
-						xLabel="Date" /* xLabel is optional, absence will not show the x value */ yLabel="C"
-						yAccessor={d => d.close}
-						xDisplayFormat={timeFormat("%Y-%m-%d")} yDisplayFormat={format(".2f")}
-						/* valueStroke="green" - optional prop */
-						/* labelStroke="#4682B4" - optional prop */
-						origin={[-40, 0]}/>
-					<SingleValueTooltip
-						yLabel="Volume" yAccessor={(d) => d.volume}
-						origin={[-40, 20]}/>
-				</Chart>
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+  					yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+
+
+					<OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
+          <CrossHairCursor />
+        </Chart>
+
 				<Chart id={2}
 					yExtents={d => d.volume}
 					height={150} origin={(w, h) => [0, h - 150]}
@@ -94,6 +86,10 @@ class AreaChartWithEdge extends React.Component {
 						stroke fill={(d) => d.close > d.open ? "#6BA583" : "#FF0000"}
 						opacity={0.4}
 						widthRatio={1} />
+            <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+  						yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F"/>
+  					<EdgeIndicator itemType="last" orient="right" edgeAt="right"
+  						yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F"/>
 				</Chart>
 				<CrossHairCursor />
 			</ChartCanvas>

@@ -1,60 +1,37 @@
-import React from 'react'
-import {connect} from 'react-redux'
 import Stock from './Stock'
-import { TypeChooser } from "react-stockcharts/lib/helper";
-import {fetchStockChart} from '../actions/stocksAction'
-import { render } from "react-dom";
-import Chart from './Chart'
-
+import StockChart from './StockChart'
+import React from 'react'
+import { Button, Container, Modal, Grid, Segment} from 'semantic-ui-react'
+import Buy from './Buy'
+import Sell from './Sell'
+import SearchBar from './SearchBar'
 
 
 class StockContainer extends React.Component {
 
-  componentDidMount() {
-    let symbol = window.location.pathname.split("/").pop()
-   this.props.fetchStockChart(symbol)
-
- }
-
-  render(){
-
-
-
+  render (){
     return (
       <React.Fragment>
-        <Stock/>
-          {
-            this.props.stockChartData == null
-              ? <div>Loading...</div>:
-              (<TypeChooser>
-                {type => <Chart type={type} data={
-                  this.props.stockChartData.map(stock =>{
-                    let newDate = new Date(stock.date)
-                    let newStock = {...stock}
-                    newStock.date = newDate
-                    return newStock
-                  })
-                } />}
-              </TypeChooser>)
-          }
+        <SearchBar/>
+        <Grid columns='equal' rows='equal' divided padded>
+          <Grid.Row textAlign='center'>
+            <Grid.Column>
+              <Segment >
+                <Stock/>
+                <Buy/>
+                <Sell/>
+              </Segment>
+            </Grid.Column>
+            <Grid.Column>
+              <Segment >
+                <StockChart/>
+              </Segment>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
       </React.Fragment>
-
     )
   }
 }
 
-const mapStateToProps =  state => {
-  return {
-    stockChartData: state.stockChartData
-  }
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    fetchStockChart: (symbol) => dispatch(fetchStockChart(symbol))
-  }
-}
-
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(StockContainer)
+export default StockContainer

@@ -20,8 +20,7 @@ class Stock extends React.Component {
         <h4>{this.props.selectedStock.symbol}</h4>
         <p>  $ {this.props.selectedStock.latestPrice}</p>
         <p> Change: {this.props.selectedStock.change}</p>
-        <Button color ="green">Buy</Button>
-        <Button color ="red">Sell</Button>
+        
       </Container>
     )
   }
