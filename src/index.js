@@ -10,6 +10,7 @@ import rootReducer from './reducers/rootReducer'
 import thunk from 'redux-thunk'
 import {composeWithDevTools} from 'redux-devtools-extension'
 import {BrowserRouter as Router} from 'react-router-dom'
+import 'react-circular-progressbar/dist/styles.css'
 
 const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
 

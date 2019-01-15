@@ -15,7 +15,6 @@ import { XAxis, YAxis } from "react-stockcharts/lib/axes";
 import {
 	CrossHairCursor,
   EdgeIndicator,
-  CurrentCoordinate,
 	MouseCoordinateX,
 	MouseCoordinateY,
 } from "react-stockcharts/lib/coordinates";

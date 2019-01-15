@@ -4,7 +4,6 @@ import {connect} from 'react-redux'
 
 import { TypeChooser } from "react-stockcharts/lib/helper";
 import {fetchStockChart} from '../actions/stocksAction'
-import { render } from "react-dom";
 
 
 

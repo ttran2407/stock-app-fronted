@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Input, TextArea, Button, Select, Modal, Message } from 'semantic-ui-react'
+import { Form, Input, Button, Modal, Message } from 'semantic-ui-react'
 
 
 const Buy = () => (
