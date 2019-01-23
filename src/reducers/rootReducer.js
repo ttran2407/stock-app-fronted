@@ -1,3 +1,4 @@
+import {stockStore} from './stockStore.js'
 const initialState = {
   user: {
     userName: "",
@@ -5,22 +6,41 @@ const initialState = {
     lastName: "",
     cash: "",
   },
+  companyInfo: null,
+  stocks: stockStore,
   ownedstocks: [],
   watchlist: [],
   transactions: [],
-  stocks:[],
-  selectedStock: {},
+  openSignUpForm: false,
+  openLoginForm: false,
+  selectedStock: {
+    symbol: "TSLA",
+    companyName: "Tesla Inc.",
+    open: 304.82,
+    close: 298.92,
+    high: 308,
+    low: 295.5,
+    latestPrice: ""
+  },
   stockChartData: null
 }
+
 
 const rootReducer = (state = initialState, action) => {
   switch(action.type){
     case('GET_STOCKS'): {
-      return {stocks: action.payload}
+      let newState = {...state}
+      newState.stocks = action.payload
+      return newState
     }
     case('GET_SINGLE_STOCK'): {
       let newState = {...state}
       newState.selectedStock = action.payload
+      return newState
+    }
+    case('GET_COMPANY_INFO'): {
+      let newState = {...state}
+      newState.companyInfo = action.payload
       return newState
     }
     case('GET_STOCK_DATA'): {
@@ -36,26 +56,37 @@ const rootReducer = (state = initialState, action) => {
     }
     case('GET_USER'): {
       let newState = {...state}
-      newState.user = action.payload
+      newState.user = action.payload.user
       return newState
     }
     case('GET_STOCK_CHANGE'): {
-      let newState = {...state}
-      let watchlist = newState.watchlist
-      let stock = watchlist.find(stock => stock.symbol === action.payload.symbol)
-      stock.change = action.payload.change
+      let stock = state.watchlist.find(stock => stock.symbol === action.payload.symbol)
+      let idx = state.watchlist.indexOf(stock)
+      let newStock = {...state.watchlist[idx], change: action.payload.changePercent}
+      let newWatchlist = [...state.watchlist]
+      newWatchlist[idx] = newStock
+      let newState = {...state, watchlist: newWatchlist}
+
+
+      // let newState = {...state}
+      // let watchlist = newState.watchlist
+      // let stock = state.watchlist.find(stock => stock.symbol === action.payload.symbol)
+      // stock.change = action.payload.change
       return newState
     }
     case('GET_OWNED_STOCK_QUOTE'): {
-      let newState = {...state}
-      let ownedstocks = newState.ownedstocks
-      let stock = ownedstocks.find(stock => stock.symbol === action.payload.symbol)
-      stock.price = action.payload.latestPrice
+      let stock = state.ownedstocks.find(stock => stock.stock_symbol === action.payload.symbol)
+      let idx = state.ownedstocks.indexOf(stock)
+      let newStock = {...state.ownedstocks[idx], price: action.payload.latestPrice, change: action.payload.changePercent}
+      let newOwnedstocks = [...state.ownedstocks]
+      newOwnedstocks[idx] = newStock
+      let newState = {...state, ownedstocks: newOwnedstocks}
+
       return newState
     }
     case('GET_OWNED_STOCKS'): {
       let newState = {...state}
-      let ownedstocks = action.payload.map(stock => {return {symbol: stock.stock_symbol,quantity: stock.quantity, price: ""}})
+      let ownedstocks = action.payload.map(stock => {return {...stock, price: ""}})
       newState.ownedstocks = ownedstocks
       return newState
     }
@@ -63,6 +94,26 @@ const rootReducer = (state = initialState, action) => {
       let newState = {...state}
       let transactions = action.payload
       newState.transactions = transactions
+      return newState
+    }
+    case('OPEN_SIGNUP_FORM'): {
+      let newState = {...state}
+      newState.openSignUpForm = true
+      return newState
+    }
+    case('CLOSE_SIGNUP_FORM'): {
+      let newState = {...state}
+      newState.openSignUpForm = false
+      return newState
+    }
+    case('OPEN_LOGIN_FORM'): {
+      let newState = {...state}
+      newState.openLoginForm = true
+      return newState
+    }
+    case('CLOSE_LOGIN_FORM'): {
+      let newState = {...state}
+      newState.openLoginForm = false
       return newState
     }
 

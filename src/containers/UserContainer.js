@@ -1,68 +1,69 @@
 import React from 'react'
-import { Grid} from 'semantic-ui-react'
-import SearchBar from '../components/SearchBar'
+import { Grid, Icon} from 'semantic-ui-react'
 import WatchlistContainer from './WatchlistContainer'
+import HoldingContainer from './HoldingContainer'
+
+import CircularChart from '../components/CircularChart'
+import Transactions from '../components/Transactions'
+
 import {connect} from 'react-redux'
 import {fetchUser, fetchOwnedstocks, fetchTransactions} from '../actions/stocksAction'
-import CircularProgressbar from 'react-circular-progressbar';
-
 
 
 
 class UserContainer extends React.Component {
 
-  componentWillMount(){
-      let userId= window.location.pathname.split("/").pop()
-      this.props.fetchUser(userId)
-      this.props.fetchOwnedstocks(userId)
-      this.props.fetchTransactions(userId)
-    }
-
-    componentDidMount(){
-      let cors = require('cors')
-      fetch(`https://seekingalpha.com/market_currents.xml`)
-      .then(res => res.text())
-      .then(console.log)
-    }
 
   render (){
-    // var convert = require('xml-js');
-    // var xml =
-    //   '<?xml version="1.0" encoding="utf-8"?>' +
-    //   '<note importance="high" logged="true">' +
-    //   '    <title>Happy</title>' +
-    //   '    <todo>Work</todo>' +
-    //   '    <todo>Play</todo>' +
-    //   '</note>';
-    //   var result2 = convert.xml2json(xml, {compact: false, spaces: 4});
-    const percentage = 90;
+
+    let balance = parseFloat(this.props.user.cash)
+    this.props.ownedstocks.forEach(stock => balance += (stock.price * stock.quantity))
+    const cashPercentage = Math.round(this.props.user.cash/balance * 10000)/100
+
     return (
-      <React.Fragment>
 
-        <SearchBar/>
-        <CircularProgressbar percentage={percentage} text={`${percentage}%`}
-        counterClockwise
-        styles={{
-          path: { stroke: `rgb(100, 83, 148)` },
-          text: { fill: '#f88', fontSize: '16px' },
+      <Grid celled="internally" >
+        <Grid.Row textAlign='center'>
+          <Grid.Column width={3} >
+              <Icon name='eye' circular />
+              WatchList
+          </Grid.Column>
+          <Grid.Column width={10}>
+            <Icon name='balance' circular />
+            Portfolio Value:  ${Math.round(balance * 100)/100}
+          </Grid.Column>
+          <Grid.Column width={3}>
+            <Icon name='shopping cart' circular />
+            Stock Holding
+          </Grid.Column>
+        </Grid.Row>
 
-        }}
-        />
-        <Grid columns='equal' rows='equal' divided padded>
-          <Grid.Row textAlign='center'>
-            <Grid.Column>
-              <WatchlistContainer/>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </React.Fragment>
+      <Grid.Row>
+        <Grid.Column width={3} textAlign='center'>
+          <WatchlistContainer/>
+        </Grid.Column>
+        <Grid.Column width={10}>
+          <CircularChart cashPercentage={cashPercentage} balance={balance} cash={this.props.user.cash}/>
+        </Grid.Column>
+        <Grid.Column width={3}>
+          <HoldingContainer/>
+        </Grid.Column>
+      </Grid.Row>
+
+      <Grid.Row className="transactions">
+        <Transactions data={this.props.transactions}/>
+      </Grid.Row>
+    </Grid>
+
     )
   }
 }
 
 const mapStateToProps = state => {
   return {
-    user: state.user
+    user: state.user,
+    ownedstocks: state.ownedstocks,
+    transactions: state.transactions
   }
 }
 

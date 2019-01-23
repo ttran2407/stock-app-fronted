@@ -1,23 +1,42 @@
 
 import React from 'react'
-import { Button, Icon } from 'semantic-ui-react'
+import { Modal,Button, Grid } from 'semantic-ui-react'
+import SignUpForm from '../components/SignUpForm'
+import {connect} from 'react-redux'
+import {openSignUp, closeSignUp} from '../actions/stocksAction'
+
 
 
 
 class WelcomeContainer extends React.Component {
 
-  render (){
-    console.log("hello");
-    return (
-      <React.Fragment>
-        <Button animated='fade' style={{"background-color": "#645394", "color": "white", "font-family": "brian", "font-size": "2em" }} size="big">
-          <Button.Content visible>INVEST For FUTURE</Button.Content>
-          <Button.Content hidden>START</Button.Content>
-        </Button>
 
-      </React.Fragment>
+  render (){
+    return (
+      <div>
+        <Grid.Row columns={1}>
+          <Grid.Column className="segment centered">
+            <Button onClick={this.props.openSignUp} animated='fade' style={{"backgroundColor": "#645394", "color": "white", "fontFamily": "brian", "fontSize": "2em" }} size="big">
+              <Button.Content visible>INVEST For FUTURE</Button.Content>
+              <Button.Content hidden>START</Button.Content>
+            </Button>
+          </Grid.Column>
+        </Grid.Row>
+        <Modal open={this.props.openSignUpForm}>
+          <Modal.Header>Sign Up</Modal.Header>
+          <Modal.Content>
+            <SignUpForm />
+            </Modal.Content>
+          </Modal>
+      </div>
     )
   }
 }
 
-export default WelcomeContainer
+const mapStateToProps = state => {
+  return {
+    openSignUpForm: state.openSignUpForm
+  }
+}
+
+export default connect(mapStateToProps, {openSignUp, closeSignUp}) (WelcomeContainer)

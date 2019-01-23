@@ -1,51 +1,61 @@
+// import _ from 'lodash'
 import React, { Component } from 'react'
-import { Search} from 'semantic-ui-react'
+import { Grid, Header, Input,  List} from 'semantic-ui-react'
+import {connect} from 'react-redux'
+import {Link} from 'react-router-dom'
 
-export default class SearchBar extends Component {
 
+ class SearchExampleStandard extends Component {
+
+  state={
+    isLoading: false,
+    results: [],
+    value: ''
+  }
   componentWillMount() {
     this.resetComponent()
   }
 
-  state = {
-    isLoading: false,
-    results: [],
-    value: ""
-  }
-
-
   resetComponent = () => this.setState({ isLoading: false, results: [], value: '' })
 
-  handleResultSelect = (e, { result }) => this.setState({ value: result.title })
+  handleClick = (e) => {this.resetComponent()}
 
-  handleSearchChange = (e, { value }) => {
-    this.setState({ isLoading: true, value })
+  handleSearchChange = (e) => {
+    if (e.target.value.length < 1){return this.resetComponent()} else {this.setState({ isLoading: true, value: e.target.value})}
+    let stockList = this.props.stocks.filter(stock => stock.name.toLowerCase().includes(this.state.value))
+    if (stockList.length > 5){stockList = stockList.slice(0,4)}
+    this.setState({results: stockList})
+    // setTimeOut(this.resetComponent(), 3000)
   }
 
-  //   setTimeout(() => {
-  //     if (this.state.value.length < 1) return this.resetComponent()
-  //
-  //     const re = new RegExp(_.escapeRegExp(this.state.value), 'i')
-  //     const isMatch = result => re.test(result.title)
-  //
-  //     this.setState({
-  //       isLoading: false,
-  //       results: _.filter(source, isMatch),
-  //     })
-  //   }, 300)
-  // }
-
   render() {
-    const { isLoading, value, results } = this.state
+    const { isLoading, results } = this.state
 
     return (
-          <Search
-            loading={isLoading}
-            onResultSelect={this.handleResultSelect}
-            onSearchChange={this.handleSearchChange}
-            results={results}
-            value={value}
-          />
+      <Grid>
+        <Grid.Column  width={10}>
+          <Input loading={isLoading} icon="search" placeholder="Search..."
+            onChange={this.handleSearchChange}/>
+          <List animated selection celled style={{"position": "fixed" , "zIndex":"5", "margin" : "0px", "border": "0px" }} >
+            {results.map(stock =>
+                <List.Item onClick={this.handleClick}  style={{"backgroundColor":"white"}} key={stock.symbol}>
+                  <Link to={`/stocks/${stock.symbol}`}>
+                    <Header as="h4" content={stock.symbol} />
+                    {stock.name}
+                  </Link>
+                </List.Item>
+
+            )}
+          </List>
+      </Grid.Column>
+      </Grid>
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    stocks: state.stocks
+  }
+}
+export default connect (mapStateToProps)(SearchExampleStandard)

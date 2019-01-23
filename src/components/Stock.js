@@ -1,41 +1,59 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {fetchSingleStock} from '../actions/stocksAction.js'
-import { Button, Container } from 'semantic-ui-react'
+import { Button, Header, Icon, List } from 'semantic-ui-react'
 
 class Stock extends React.Component {
 
-   componentDidMount() {
 
-     let symbol = window.location.pathname.split("/").pop()
-    this.props.fetchSingleStock(symbol)
 
-  }
+
 
   render(){
-    console.log(this.props.selectedStock)
+
+    const {symbol, latestPrice, changePercent} = this.props.selectedStock
+    console.log(symbol)
+    let quantity = this.props.ownedstocks.filter(stock => stock.stock_symbol.toLowerCase() === symbol.toLowerCase())
     return (
-      <Container>
-        <Button color ="green">Watching</Button>
-        <h4>{this.props.selectedStock.symbol}</h4>
-        <p>  $ {this.props.selectedStock.latestPrice}</p>
-        <p> Change: {this.props.selectedStock.change}</p>
-        
-      </Container>
+      <List>
+        <List.Item>
+        {this.props.watchlist.find(stock => stock.symbol.toUpperCase() === symbol.toUpperCase()) ?
+        ( <Button icon labelPosition="left" color ="green">
+            <Icon name="eye"/>
+            Watching
+          </Button>) :
+        ( <Button icon labelPosition="left" color ="red">
+            <Icon name="eye"/>
+            Watch
+          </Button>)}
+        </List.Item>
+        <List.Item>
+          <List.Content>
+            <Header as="h4" content={symbol}/>
+          </List.Content>
+        </List.Item>
+        <List.Item>
+          <List.Content content={`$ ${latestPrice}`} floated='left'/>
+          <List.Content floated='right'>
+            {changePercent >= 0 ?
+              <Icon name='chevron circle up' color="green"/> :
+              <Icon name='chevron circle down' color="red"/>}
+            {Math.round(changePercent * 10000)/100}%
+          </List.Content>
+        </List.Item>
+        <p> Owned: {quantity.length !== 0 ? quantity[0].quantity : "0"}</p>
+
+      </List>
     )
   }
 }
 
 const mapStateToProps =  state => {
   return {
-    selectedStock: state.selectedStock
+    selectedStock: state.selectedStock,
+    ownedstocks: state.ownedstocks,
+    watchlist: state.watchlist
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    fetchSingleStock: (symbol) => dispatch(fetchSingleStock(symbol))
-  }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(Stock)
+export default connect(mapStateToProps)(Stock)

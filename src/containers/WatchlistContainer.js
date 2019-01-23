@@ -1,32 +1,29 @@
 import React from 'react'
 import WatchlistStock from '../components/WatchlistStock'
 import {connect} from 'react-redux'
-import {fetchWatchlist} from '../actions/stocksAction'
+import {updateWatchlistChange} from '../actions/stocksAction'
+import { List} from 'semantic-ui-react'
+
 
 
 
 class WatchlistContainer extends React.Component {
-
-  componentWillMount(){
-      let userId= window.location.pathname.split("/").pop()
-      this.props.fetchWatchlist(userId)
-    }
-
   render(){
-    let watchlist = this.props.watchlist.map(stock => <WatchlistStock key={stock.symbol} symbol={stock.symbol}/>)
-
     return(
-     <div className="watch-list-containers">
-      {watchlist}
-     </div>
+     <List animated selection divided verticalAlign='middle'>
+       {this.props.watchlist.map(stock =>
+         <WatchlistStock key={stock.symbol} stock={stock} />
+       )}
+     </List>
     )
   }
 }
 
 const mapStateToProps = state => {
+
   return {
     watchlist: state.watchlist
   }
 }
 
-export default connect (mapStateToProps, {fetchWatchlist})(WatchlistContainer)
+export default connect (mapStateToProps, {updateWatchlistChange})(WatchlistContainer)
