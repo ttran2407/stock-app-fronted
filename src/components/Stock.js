@@ -1,14 +1,24 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import { Button, Header, Icon, List } from 'semantic-ui-react'
+import {fetchUnWatchStock, fetchWatchStock} from '../actions/stocksAction'
 
 class Stock extends React.Component {
 
 
+  handleUnWatchClick = (e) => {
+    let watchlist = this.props.watchlist.find(watchlist => watchlist.symbol.toUpperCase() === this.props.selectedStock.symbol.toUpperCase())
+    this.props.fetchUnWatchStock(watchlist.id, this.props.user.id)
+  }
 
+  handleWatchClick = (e) => {
+    let stock = this.props.stocks.find(stock => stock.symbol.toUpperCase() === this.props.selectedStock.symbol.toUpperCase())
+    this.props.fetchWatchStock(stock, this.props.user.id)
 
+  }
 
   render(){
+
 
     const {symbol, latestPrice, changePercent} = this.props.selectedStock
     console.log(symbol)
@@ -17,31 +27,30 @@ class Stock extends React.Component {
       <List>
         <List.Item>
         {this.props.watchlist.find(stock => stock.symbol.toUpperCase() === symbol.toUpperCase()) ?
-        ( <Button icon labelPosition="left" color ="green">
+        ( <Button onClick={this.handleUnWatchClick} icon labelPosition="left" color ="green">
             <Icon name="eye"/>
             Watching
           </Button>) :
-        ( <Button icon labelPosition="left" color ="red">
-            <Icon name="eye"/>
+        ( <Button onClick={this.handleWatchClick} icon labelPosition="left" color ="red">
+            <Icon name="low vision"/>
             Watch
           </Button>)}
         </List.Item>
         <List.Item>
           <List.Content>
-            <Header as="h4" content={symbol}/>
+            <Header style={{ "marginTop": "40px", "marginBottom": "10px"}} as="h4" content={symbol}/>
           </List.Content>
         </List.Item>
-        <List.Item>
-          <List.Content content={`$ ${latestPrice}`} floated='left'/>
-          <List.Content floated='right'>
+        <List.Item >
+          <List.Content style={{"display": "inline", "marginRight": "20px"}} content={`$ ${latestPrice}`} />
+          <List.Content style={{"display": "inline", "marginLeft": "20px"}}  >
             {changePercent >= 0 ?
               <Icon name='chevron circle up' color="green"/> :
               <Icon name='chevron circle down' color="red"/>}
             {Math.round(changePercent * 10000)/100}%
           </List.Content>
         </List.Item>
-        <p> Owned: {quantity.length !== 0 ? quantity[0].quantity : "0"}</p>
-
+        <p style={{ "marginTop": "20px" }}> Owned: {quantity.length !== 0 ? quantity[0].quantity : "0"}</p>
       </List>
     )
   }
@@ -49,6 +58,8 @@ class Stock extends React.Component {
 
 const mapStateToProps =  state => {
   return {
+    user: state.user,
+    stocks: state.stocks,
     selectedStock: state.selectedStock,
     ownedstocks: state.ownedstocks,
     watchlist: state.watchlist
@@ -56,4 +67,4 @@ const mapStateToProps =  state => {
 }
 
 
-export default connect(mapStateToProps)(Stock)
+export default connect(mapStateToProps, {fetchUnWatchStock, fetchWatchStock})(Stock)

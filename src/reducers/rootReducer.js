@@ -1,11 +1,7 @@
 import {stockStore} from './stockStore.js'
 const initialState = {
-  user: {
-    userName: "",
-    firstName: "",
-    lastName: "",
-    cash: "",
-  },
+  user: null,
+  stockvalue: 0,
   companyInfo: null,
   stocks: stockStore,
   ownedstocks: [],
@@ -50,13 +46,14 @@ const rootReducer = (state = initialState, action) => {
     }
     case('GET_WATCH_LIST'): {
       let newState = {...state}
-      let watchlist = action.payload.map(stock => {return {symbol: stock.stock_symbol, change: 0}})
+      let watchlist = action.payload.map(stock => {return {id: stock.id, symbol: stock.stock_symbol, change: 0}})
       newState.watchlist = watchlist
       return newState
     }
     case('GET_USER'): {
+
       let newState = {...state}
-      newState.user = action.payload.user
+      newState.user = action.payload
       return newState
     }
     case('GET_STOCK_CHANGE'): {

@@ -13,13 +13,15 @@ class Buy extends React.Component{
     price: "",
     quantity: "",
     transaction_type: "BUY",
+    modalOpen: false
   }
 
 
   handleSubmit = (e) => {
     e.preventDefault()
-    let stock = this.props.stocks.find(stock => stock.symbol.toLowerCase() === this.state.symbol)
+    let stock = this.props.stocks.find(stock => stock.symbol.toUpperCase() === this.state.symbol.toUpperCase())
     this.props.createBuyTransaction(this.state, this.props.user.id, stock)
+    this.handleClick()
   }
 
   handleChange = (e) => {
@@ -29,10 +31,16 @@ class Buy extends React.Component{
     }, console.log(this.state))
   }
 
+  handleClick =() => {this.setState({modalOpen: !this.state.modalOpen})}
+
   render(){
 
+
     return(
-      <Modal trigger={<Button color ="green">Buy</Button>}>
+      <Modal
+        trigger={<Button onClick={this.handleClick} style={{ "marginRight": "20px"}} color ="green">Buy</Button>}
+        open={this.state.modalOpen}
+        onClose={this.handleClick}>
         <Modal.Header>
           Buy {`${window.location.pathname.split("/").pop().toUpperCase()}`}
           Current Price: {this.props.selectedStock.latestPrice}
@@ -60,7 +68,7 @@ class Buy extends React.Component{
                 label='Price'
               />
             </Form.Group>
-            <Button type='submit' color="green">Buy</Button>
+            <Button  type='submit' color="green">Buy</Button>
           </Form>
         </Modal.Content>
       </Modal>

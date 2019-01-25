@@ -15,26 +15,29 @@ class Transactions extends React.Component {
         <Table.Cell>{transaction.transaction_type}</Table.Cell>
         <Table.Cell>{transaction.stock_symbol}</Table.Cell>
         <Table.Cell>{transaction.quantity}</Table.Cell>
-        <Table.Cell>{transaction.price}</Table.Cell>
+        <Table.Cell>${transaction.price}</Table.Cell>
         <Table.Cell>{transaction.status_id === 2 ?  "COMPLETED" : (transaction.status_id === 1 ? "PENDING" : "CANCELED" ) }</Table.Cell>
       </Table.Row>
     )
     return (
-      <Table striped>
-        <Table.Header>
-          <Table.Row>
-            <Table.HeaderCell>Date</Table.HeaderCell>
-            <Table.HeaderCell>Type</Table.HeaderCell>
-            <Table.HeaderCell>Ticker</Table.HeaderCell>
-            <Table.HeaderCell>Quantity</Table.HeaderCell>
-            <Table.HeaderCell>Price</Table.HeaderCell>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {transactionList}
-        </Table.Body>
-      </Table>
+      <div style={{"height": "50vh", "overflow": "scroll", "width": "100%"}}>
+        <Table  striped>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Date</Table.HeaderCell>
+              <Table.HeaderCell>Type</Table.HeaderCell>
+              <Table.HeaderCell>Ticker</Table.HeaderCell>
+              <Table.HeaderCell>Quantity</Table.HeaderCell>
+              <Table.HeaderCell>Price</Table.HeaderCell>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {transactionList}
+          </Table.Body>
+        </Table>
+      </div>
+
     )
   }
 }

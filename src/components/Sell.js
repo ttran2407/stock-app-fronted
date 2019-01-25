@@ -10,14 +10,16 @@ class Sell extends React.Component{
     symbol: window.location.pathname.split("/").pop(),
     price: "",
     quantity: "",
-     transaction_type: "SELL"
+     transaction_type: "SELL",
+     modalOpen: false
   }
 
 
   handleSubmit = (e) => {
     e.preventDefault()
-    let ownedstock = this.props.ownedstocks.find(stock => stock.stock_symbol.toLowerCase() === this.state.symbol)
+    let ownedstock = this.props.ownedstocks.find(stock => stock.stock_symbol.toLowerCase() === this.state.symbol.toLowerCase())
     this.props.createSellTransaction(this.state, this.props.user.id, ownedstock)
+    this.handleClick()
   }
 
   handleChange = (e) => {
@@ -26,10 +28,19 @@ class Sell extends React.Component{
     }, console.log(this.state))
   }
 
+  handleClick =() => {this.setState({modalOpen: !this.state.modalOpen})}
+
   render(){
+  let quantity = this.props.ownedstocks.filter(stock => stock.stock_symbol.toLowerCase() === this.props.selectedStock.symbol.toLowerCase())
     return (
 
-      <Modal trigger={<Button color ="green">Sell</Button>}>
+      <Modal  trigger={quantity.length !== 0 ?
+          <Button onClick={this.handleClick} style={{ "marginRight": "20px"}} color ="green">Sell</Button> :
+          <Button disabled style={{ "marginRight": "20px"}} color ="green">Sell</Button>
+        }
+        open={this.state.modalOpen}
+        onClose={this.handleClick}
+      >
         <Modal.Header>
           Sell {`${window.location.pathname.split("/").pop().toUpperCase()}`}
           Current Price: {this.props.selectedStock.latestPrice}
@@ -56,7 +67,7 @@ class Sell extends React.Component{
                 label='Price'
               />
             </Form.Group>
-            <Button type='submit' color="red">Sell</Button>
+            <Button  type='submit' color="red">Sell</Button>
           </Form>
         </Modal.Content>
       </Modal>

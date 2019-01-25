@@ -15,17 +15,18 @@ import {Link} from 'react-router-dom'
 
   render() {
 
-
+    console.log(this.props.user)
     return (
       <Menu secondary>
-        <Link to="/">
+        <a href="http://localhost:3001/">
           <Menu.Item icon="home" name='home'/>
-        </Link>
+        </a>
+    
         <Menu.Menu position='right'>
           <Menu.Item>
             <SearchBar/>
           </Menu.Item>
-          {this.props.user.id ?
+          {this.props.user ?
             (
               <Menu.Item
                 name= {`hello ${this.props.user.first_name}`}

@@ -14,6 +14,7 @@ const openSignUp = () => ({type: "OPEN_SIGNUP_FORM"})
 const closeSignUp = () => ({type: "CLOSE_SIGNUP_FORM"})
 const openLogin = () => ({type: "OPEN_LOGIN_FORM"})
 const closeLogin = () => ({type: "CLOSE_LOGIN_FORM"})
+const updateStockBalance = (stockbalance) => ({type: "UPDATE_STOCK_BALANCE", payload: stockbalance})
 
 /* ---------- THUNK CREATORS ------------- */
 
@@ -69,13 +70,14 @@ const updateWatchlistChange = (symbol, dispatch) => {
 }
 
 
-const fetchUser = (user_id) => {
-  return dispatch => {
-    return fetch(`http://localhost:3000/users/${user_id}`)
-    .then(res => res.json())
-    .then(user => dispatch(getUser(user)))
-  }
-}
+// const fetchUser = (user_id) => {
+//   return dispatch => {
+//     return fetch(`http://localhost:3000/users/${user_id}`)
+//     .then(res => res.json())
+//     .then(console.log)
+//     .then(user => dispatch(getUser(user.user)))
+//   }
+// }
 
 const updateOwnedStockPrice = (symbol,dispatch) => {
    fetch(`https://api.iextrading.com/1.0/stock/${symbol}/quote`)
@@ -141,9 +143,10 @@ const createBuyTransaction = (transaction, user_id, stock) => {
       })
     })
     .then(res => res.json())
-    .then(transaction => {
-      return transaction.status_id === 2 ?
-      createOwnedStock(transaction, dispatch):
+    .then(object => {
+      return object.transaction.status_id === 2 ?
+      (createOwnedStock(object.transaction, dispatch),
+      dispatch(getTransactions(object.transactions))):
       (null)
     })
   }
@@ -168,7 +171,11 @@ const createOwnedStock = (transaction, dispatch) => {
       })
     })
     .then(res => res.json())
-    .then(console.log)
+    .then(object => {
+      dispatch(getUser(object.user))
+      dispatch(getOwnedStocks(object.ownedstocks))
+      
+    })
 }
 
 const createSellTransaction = (transaction, user_id, ownedstock) => {
@@ -192,9 +199,10 @@ const createSellTransaction = (transaction, user_id, ownedstock) => {
       })
     })
     .then(res => res.json())
-    .then(transaction => {
-      return transaction.status_id === 2 ?
-      destroyOwnedStock(transaction, dispatch, ownedstock):
+    .then(object => {
+      return object.transaction.status_id === 2 ?
+      (destroyOwnedStock(object.transaction, dispatch, ownedstock),
+      dispatch(getTransactions(object.transactions))):
       (null)
     })
   }
@@ -220,7 +228,63 @@ const destroyOwnedStock = (transaction, dispatch, ownedstock) => {
       })
     })
     .then(res => res.json())
-    .then(console.log)
+    .then(object => {
+      dispatch(getUser(object.user))
+      dispatch(getOwnedStocks(object.ownedstocks))
+    })
+}
+
+
+
+const fetchUnWatchStock = (watchlist_id, user_id) => {
+  let token = localStorage.getItem("token")
+  return dispatch => {
+    return fetch(`http://localhost:3000/users/${user_id}/watchlists/${watchlist_id}`,{
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Action": "application/json",
+        "Authorization": `${token}`
+      }
+    })
+    .then(res => res.json())
+    .then(watchlist => {
+       dispatch(getWatchlist(watchlist))
+          watchlist.forEach(stock => updateWatchlistChange(stock.stock_symbol, dispatch))
+        })
+  }
+}
+
+const fetchWatchStock = (stock, user_id) => {
+  let token = localStorage.getItem("token")
+  return dispatch => {
+    return fetch(`http://localhost:3000/users/${user_id}/watchlists/`,{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Action": "application/json",
+        "Authorization": `${token}`
+      },
+      body: JSON.stringify({
+        user_id:  user_id,
+        stock_id: stock.id,
+        stock_symbol: stock.symbol,
+      })
+    })
+    .then(res => res.json())
+    .then(watchlist => {
+       dispatch(getWatchlist(watchlist))
+       watchlist.forEach(stock => updateWatchlistChange(stock.stock_symbol, dispatch))
+        })
+  }
+}
+
+const getStockBalance =(ownedstocks) => {
+  return dispatch => {
+    let stockbalance =0
+    ownedstocks.forEach(stock => stockbalance += (stock.price * stock.quantity))
+    dispatch(updateStockBalance(stockbalance))
+  }
 }
 
 
@@ -232,11 +296,11 @@ const destroyOwnedStock = (transaction, dispatch, ownedstock) => {
 
 export {fetchSingleStock, getUser,
         fetchStockChart, fetchWatchlist,
-        updateWatchlistChange,fetchUser,
+        updateWatchlistChange,
         updateOwnedStockPrice, fetchOwnedstocks,
         fetchTransactions, openSignUp,
         closeSignUp, openLogin,
         closeLogin, createBuyTransaction,
-        createSellTransaction, fetchCompanyInfo
-
+        createSellTransaction, fetchCompanyInfo,
+        fetchUnWatchStock, fetchWatchStock
       }

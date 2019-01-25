@@ -1,7 +1,7 @@
 import Stock from './Stock'
 import StockChart from './StockChart'
 import React from 'react'
-import {Grid, Segment} from 'semantic-ui-react'
+import {Grid, Segment, Card} from 'semantic-ui-react'
 import Buy from './Buy'
 import Sell from './Sell'
 import {connect} from 'react-redux'
@@ -34,11 +34,16 @@ class StockContainer extends React.Component {
             <Grid.Column width={8}>
               <Grid.Row>
                 <Stock/>
-                <Buy/>
-                <Sell/>
+                <Buy />
+                <Sell />
               </Grid.Row>
-              <Grid.Row>
-                <CompanyInfo/>
+              <Grid.Row >
+                <Card style={{"width": "100%", "marginTop": "20px"}}>
+                  <Card.Content header="About Company" />
+                  <Card.Content>
+                    <CompanyInfo/>
+                  </Card.Content>
+                </Card>
               </Grid.Row>
             </Grid.Column>
             <Grid.Column width={8}>
