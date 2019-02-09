@@ -1,6 +1,6 @@
 import React from 'react'
-import {Button, Form } from 'semantic-ui-react'
-import { getUser, closeLogin} from '../actions/stocksAction'
+import {Button, Form, Message } from 'semantic-ui-react'
+import { getUser, fetchOwnedstocks, fetchWatchlist, fetchTransactions} from '../actions/stocksAction'
 import {connect } from 'react-redux'
 
 
@@ -9,7 +9,7 @@ class LoginForm extends React.Component {
   state = {
     userName: "",
     password: "",
-
+    showError: false
   }
 
   handleChange = (e) => {
@@ -31,22 +31,29 @@ class LoginForm extends React.Component {
       body: JSON.stringify({
         user: {
           user_name: userInfo.userName,
-          password: userInfo.password
+          password: userInfo.password,
         }
       })
     })
     .then(res => res.json())
     .then(user => {
-      localStorage.setItem("token", user.jwt);
-      this.props.getUser(user);
-      this.props.closeLogin()
+      if (user.error !== undefined){
+        this.setState({showError: true})
+      } else {
+        localStorage.setItem("token", user.jwt);
+        this.props.getUser(user.user);
+        this.props.fetchWatchlist(user.user.id)
+        this.props.fetchOwnedstocks(user.user.id)
+        this.props.fetchTransactions(user.user.id)
+      }
+
     })
   }
 
   render(){
     const {userName, password} = this.state
     return(
-      <Form onSubmit={this.handleSubmit}>
+      <Form error={this.state.showError} onSubmit={this.handleSubmit}>
         <Form.Field>
           <label>User Name</label>
           <input name='userName' value={userName} onChange={this.handleChange} placeholder='UserName' />
@@ -55,6 +62,11 @@ class LoginForm extends React.Component {
           <label>Password</label>
           <input type='password'  name='password' value={password} onChange={this.handleChange} placeholder='PassWord' />
         </Form.Field>
+        <Message
+          error
+          header='Failed to Log In'
+          content='Invalid UserName or Password. Please try again.'
+        />
 
         <Button type='submit'>Submit</Button>
       </Form>
@@ -62,4 +74,4 @@ class LoginForm extends React.Component {
   }
 }
 
-export default connect (null, {getUser, closeLogin})(LoginForm)
+export default connect (null, {getUser, fetchOwnedstocks, fetchWatchlist, fetchTransactions})(LoginForm)

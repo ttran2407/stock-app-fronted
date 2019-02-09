@@ -21,7 +21,6 @@ class Stock extends React.Component {
 
 
     const {symbol, latestPrice, changePercent} = this.props.selectedStock
-    console.log(symbol)
     let quantity = this.props.ownedstocks.filter(stock => stock.stock_symbol.toLowerCase() === symbol.toLowerCase())
     return (
       <List>
@@ -31,7 +30,7 @@ class Stock extends React.Component {
             <Icon name="eye"/>
             Watching
           </Button>) :
-        ( <Button onClick={this.handleWatchClick} icon labelPosition="left" color ="red">
+        ( <Button onClick={this.handleWatchClick} icon labelPosition="left" style={{"color":"9896A4"}} >
             <Icon name="low vision"/>
             Watch
           </Button>)}

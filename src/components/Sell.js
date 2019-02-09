@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Input, Modal, Button } from 'semantic-ui-react'
+import { Form, Input, Modal, Button, Message } from 'semantic-ui-react'
 import {connect } from 'react-redux'
 import {createSellTransaction} from '../actions/stocksAction'
 
@@ -9,17 +9,24 @@ class Sell extends React.Component{
   state= {
     symbol: window.location.pathname.split("/").pop(),
     price: "",
-    quantity: "",
+    quantity: 1,
      transaction_type: "SELL",
-     modalOpen: false
+     modalOpen: false,
+     showError: false
   }
 
 
   handleSubmit = (e) => {
     e.preventDefault()
     let ownedstock = this.props.ownedstocks.find(stock => stock.stock_symbol.toLowerCase() === this.state.symbol.toLowerCase())
-    this.props.createSellTransaction(this.state, this.props.user.id, ownedstock)
-    this.handleClick()
+    if (this.state.quantity > ownedstock.quantity){
+      this.setState({showError: true})
+    } else{
+      this.props.createSellTransaction(this.state, this.props.user.id, ownedstock)
+      this.setState({modalOpen: false})
+    }
+
+
   }
 
   handleChange = (e) => {
@@ -28,7 +35,13 @@ class Sell extends React.Component{
     }, console.log(this.state))
   }
 
-  handleClick =() => {this.setState({modalOpen: !this.state.modalOpen})}
+  handleClick =() => {
+    this.setState({
+      modalOpen: !this.state.modalOpen,
+      price: this.props.selectedStock.latestPrice,
+      showError: false
+    })
+  }
 
   render(){
   let quantity = this.props.ownedstocks.filter(stock => stock.stock_symbol.toLowerCase() === this.props.selectedStock.symbol.toLowerCase())
@@ -43,30 +56,38 @@ class Sell extends React.Component{
       >
         <Modal.Header>
           Sell {`${window.location.pathname.split("/").pop().toUpperCase()}`}
-          Current Price: {this.props.selectedStock.latestPrice}
+           - Current Price: {this.props.selectedStock.latestPrice}
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={this.handleSubmit}>
+          <Form error={this.state.showError} onSubmit={this.handleSubmit}>
             <Form.Group widths='equal'>
               <Form.Field
                 name="quantity"
+                min={1}
                 onChange={this.handleChange}
                 type='number'
                 id='form-input-control-quantity'
                 control={Input}
                 label='Quantity'
-                placeholder='100'
+                value={this.state.quantity}
               />
               <Form.Field
-                placeholder={this.props.selectedStock.latestPrice}
                 name="price"
+                min={1}
                 onChange={this.handleChange}
-                type="float"
+                type="number"
+                step="0.01"
                 id='form-input-control-Price'
                 control={Input}
                 label='Price'
+                value={this.state.price}
               />
             </Form.Group>
+            <Message
+              error
+              header='Transactions Declined'
+              content='You do not have enough shares. Please re-enter quantity amount'
+            />
             <Button  type='submit' color="red">Sell</Button>
           </Form>
         </Modal.Content>

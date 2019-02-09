@@ -10,11 +10,8 @@ const getUser = (user) => ({type: "GET_USER", payload: user})
 const getStockChange = (stock) => ({type: "GET_STOCK_CHANGE", payload: stock})
 const getOwnedStockQuote = (stock) => ({type: "GET_OWNED_STOCK_QUOTE", payload: stock})
 const getTransactions = (transactions) => ({type: "GET_TRANSACTIONS", payload: transactions})
-const openSignUp = () => ({type: "OPEN_SIGNUP_FORM"})
-const closeSignUp = () => ({type: "CLOSE_SIGNUP_FORM"})
-const openLogin = () => ({type: "OPEN_LOGIN_FORM"})
-const closeLogin = () => ({type: "CLOSE_LOGIN_FORM"})
-const updateStockBalance = (stockbalance) => ({type: "UPDATE_STOCK_BALANCE", payload: stockbalance})
+
+// const updateStockBalance = (stockbalance) => ({type: "UPDATE_STOCK_BALANCE", payload: stockbalance})
 
 /* ---------- THUNK CREATORS ------------- */
 
@@ -174,7 +171,7 @@ const createOwnedStock = (transaction, dispatch) => {
     .then(object => {
       dispatch(getUser(object.user))
       dispatch(getOwnedStocks(object.ownedstocks))
-      
+
     })
 }
 
@@ -279,11 +276,31 @@ const fetchWatchStock = (stock, user_id) => {
   }
 }
 
-const getStockBalance =(ownedstocks) => {
+// const getStockBalance =(ownedstocks) => {
+//   return dispatch => {
+//     let stockbalance =0
+//     ownedstocks.forEach(stock => stockbalance += (stock.price * stock.quantity))
+//     dispatch(updateStockBalance(stockbalance))
+//   }
+// }
+
+const depositMoney = (user_id, cash) => {
+  let token = localStorage.getItem("token")
   return dispatch => {
-    let stockbalance =0
-    ownedstocks.forEach(stock => stockbalance += (stock.price * stock.quantity))
-    dispatch(updateStockBalance(stockbalance))
+    return fetch(`http://localhost:3000/users/${user_id}`,{
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Action": "application/json",
+        "Authorization": `${token}`
+      },
+      body: JSON.stringify({
+        user_id:  user_id,
+        cash: cash
+      })
+    })
+    .then(res => res.json())
+    .then(user => dispatch(getUser(user)))
   }
 }
 
@@ -298,9 +315,8 @@ export {fetchSingleStock, getUser,
         fetchStockChart, fetchWatchlist,
         updateWatchlistChange,
         updateOwnedStockPrice, fetchOwnedstocks,
-        fetchTransactions, openSignUp,
-        closeSignUp, openLogin,
-        closeLogin, createBuyTransaction,
+        fetchTransactions, createBuyTransaction,
         createSellTransaction, fetchCompanyInfo,
-        fetchUnWatchStock, fetchWatchStock
+        fetchUnWatchStock, fetchWatchStock,
+        depositMoney
       }

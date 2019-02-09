@@ -1,7 +1,7 @@
 import Stock from './Stock'
 import StockChart from './StockChart'
 import React from 'react'
-import {Grid, Segment, Card} from 'semantic-ui-react'
+import {Grid, Card} from 'semantic-ui-react'
 import Buy from './Buy'
 import Sell from './Sell'
 import {connect} from 'react-redux'
@@ -23,7 +23,6 @@ class StockContainer extends React.Component {
   }
 
   render (){
-    console.log(this.props.router)
     const symbol = window.location.pathname.split("/").pop()
     let selectedStockTransactions = this.props.transactions.filter(
       transaction => transaction.stock_symbol.toUpperCase() === symbol.toUpperCase()

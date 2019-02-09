@@ -1,5 +1,4 @@
 import React from 'react'
-import { Table } from 'semantic-ui-react'
 import {connect } from 'react-redux'
 
 class CompanyInfo extends React.Component {

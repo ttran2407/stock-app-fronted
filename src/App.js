@@ -6,8 +6,7 @@ import {Route,Switch, withRouter} from 'react-router-dom'
 import NavBar from './components/NavBar'
 import {connect} from 'react-redux'
 
-import { Modal,Button, Grid, Segment, Container } from 'semantic-ui-react'
-import {getUser, fetchWatchlist, fetchOwnedstocks, fetchTransactions, fetchStocks} from './actions/stocksAction'
+import {getUser, fetchWatchlist, fetchOwnedstocks, fetchTransactions} from './actions/stocksAction'
 
 
 
@@ -37,19 +36,22 @@ class App extends Component {
     })
   }
 
-// style={{"height": "100%",}}
+
+
   render() {
+
     return (
-      <div className="App">
-        <NavBar/>
+      <div >
+        {this.props.user ? <NavBar/> : null}
         <Switch>
           <Route path="/stocks/:symbol" component={StockContainer} key={window.location.pathname}></Route>
           <Route exact path= "/"
             render={() =>(
               this.props.user ?
               <UserContainer/>:
-              <WelcomeContainer/>
+              <WelcomeContainer  />
             )}>
+
           </Route>
         </Switch>
       </div>

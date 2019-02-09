@@ -11,7 +11,7 @@ class HoldingContainer extends React.Component {
 
 
   render(){
-    let ownedstocks = this.props.ownedstocks.map(stock => <HoldingStock key={stock.symbol} stock={stock}/>)
+    let ownedstocks = this.props.ownedstocks.map(stock => <HoldingStock key={stock.stock_symbol} stock={stock}/>)
     return(
      <List animated selection divided verticalAlign='middle'>
        {ownedstocks}

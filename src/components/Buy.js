@@ -11,31 +11,45 @@ class Buy extends React.Component{
   state= {
     symbol: window.location.pathname.split("/").pop(),
     price: "",
-    quantity: "",
+    quantity: "1",
     transaction_type: "BUY",
-    modalOpen: false
+    modalOpen: false,
+    showError: false
   }
 
 
   handleSubmit = (e) => {
+    let transactionValue = parseFloat(this.state.price) * parseInt(this.state.quantity)
+
     e.preventDefault()
     let stock = this.props.stocks.find(stock => stock.symbol.toUpperCase() === this.state.symbol.toUpperCase())
-    this.props.createBuyTransaction(this.state, this.props.user.id, stock)
-    this.handleClick()
+    if (transactionValue > parseFloat(this.props.user.cash)){
+      this.setState({showError: true})
+    } else {
+      this.props.createBuyTransaction(this.state, this.props.user.id, stock)
+      this.setState({
+        modalOpen: false,
+      })
+    }
+
   }
 
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
-
-    }, console.log(this.state))
+    })
   }
 
-  handleClick =() => {this.setState({modalOpen: !this.state.modalOpen})}
+  handleClick =() => {
+    this.setState({
+      modalOpen: !this.state.modalOpen,
+      price: this.props.selectedStock.latestPrice,
+      showError: false
+    })
+  }
+
 
   render(){
-
-
     return(
       <Modal
         trigger={<Button onClick={this.handleClick} style={{ "marginRight": "20px"}} color ="green">Buy</Button>}
@@ -46,29 +60,36 @@ class Buy extends React.Component{
           Current Price: {this.props.selectedStock.latestPrice}
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={this.handleSubmit}>
+          <Form error={this.state.showError} onSubmit={this.handleSubmit}>
             <Form.Group widths='equal'>
               <Form.Field
                 name="quantity"
                 onChange={this.handleChange}
                 type='number'
+                min={1}
                 id='form-input-control-quantity'
                 control={Input}
                 label='Quantity'
-                placeholder='100'
-
+                value={this.state.quantity}
               />
               <Form.Field
-                placeholder={this.props.selectedStock.latestPrice}
                 name="price"
                 onChange={this.handleChange}
-                type="float"
+                type="number"
+                min={0.1}
+                step="0.01"
                 id='form-input-control-Price'
                 control={Input}
-                label='Price'
+                label="Price"
+                value={this.state.price}
               />
             </Form.Group>
-            <Button  type='submit' color="green">Buy</Button>
+            <Message
+              error
+              header='Transactions Declined'
+              content='You do not have enough cash. Please re-enter quantity amount or deposit money'
+            />
+            <Button type='submit' color="green">Buy</Button>
           </Form>
         </Modal.Content>
       </Modal>
